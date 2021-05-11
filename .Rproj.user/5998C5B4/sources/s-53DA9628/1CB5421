@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1620744536708.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "1CB5421",
+    "lastKnownWriteTime" : 1620749164,
+    "last_content_update" : 1620749164286,
+    "path" : "~/Workspace/pwrIRGP/R/pwr_elbow.R",
+    "project_path" : "R/pwr_elbow.R",
+    "properties" : {
+        "cursorPosition" : "25,54",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

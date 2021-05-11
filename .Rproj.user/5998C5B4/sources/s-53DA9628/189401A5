@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1620747875281.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "189401A5",
+    "lastKnownWriteTime" : 1620750136,
+    "last_content_update" : 1620750136,
+    "path" : "~/Workspace/pwrIRGP/vignettes/example.Rmd",
+    "project_path" : "vignettes/example.Rmd",
+    "properties" : {
+        "cursorPosition" : "1,16",
+        "last_setup_crc32" : "",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
