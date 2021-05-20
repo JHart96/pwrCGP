@@ -102,6 +102,16 @@ net_cor <- function(X, D, directed=FALSE, ci=0.95, show_diagnostic=TRUE) {
 
   summary <- signif(summary, 3)
   summary
+  obj <- list()
+  obj$summary <- summary
+  obj$a <- a_
+  obj$b <- b_
+  class(obj) <- "net_cor"
+  obj
+}
+
+print.net_cor <- function(obj) {
+  print(obj$summary)
 }
 
 # Harmonic mean.

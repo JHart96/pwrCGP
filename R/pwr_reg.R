@@ -11,7 +11,7 @@
 #' @param effect Real value between 0 and 1 describing the effect size (correlation coefficient) between response and predictor in the true underlying network, before considering sampling.
 #' @param soc_diff Positive real value descriing the social differentiation estimated using `net_cor`.
 #' @param int_rate Positive real value describing interaction rate estimated using `net_cor`.
-#' @param samp_times Real value describing mean sampling time per dyad or squares matrix of sampling times for each pair of nodes.
+#' @param samp_times Real value describing mean sampling time per dyad or square matrix of sampling times for each pair of nodes.
 #' @param sig_level Real valued significance level of power analysis. Defaults to 0.05.
 #' @param metric_fn Metric function used to compute node-level response. Choose from presets or provide a function that accepts igraph graphs as input and outputs a vector of the correct size.
 #' @param directed TRUE/FALSE indicating if the network is directed.
@@ -34,7 +34,14 @@
 #' # Run node regression power analysis.
 #' pwr_nodereg(20, 0.5, 2, 0.5, D)
 #'
-pwr_nodereg <- function (nodes, effect, soc_diff, int_rate, samp_times, sig_level=0.05, metric_fn=c("strength", "eigenvector", "closeness", "betweenness"), directed=FALSE, num_iters=1000) {
+pwr_nodereg <- function (nodes, effect, soc_diffs, int_rates, samp_times, sig_level=0.05, metric_fn=c("strength", "eigenvector", "closeness", "betweenness"), directed=FALSE, num_iters=1000) {
+  cat("Running simulations...")
+  k <- length(soc_diffs)
+
+  summary_table <- matrix(0, nrow=k, ncol=3)
+  colnames(summary_table) <- c("Social Differentiation", "Interaction Rate", "Power")
+  rownames(summary_table) <- rep("", k)
+
   if (length(metric_fn) > 1) {
     metric_fn = "strength"
   }
@@ -64,43 +71,61 @@ pwr_nodereg <- function (nodes, effect, soc_diff, int_rate, samp_times, sig_leve
   } else {
     sampling_times <- samp_times
   }
+  for (i in 1:k) {
+    soc_diff <- soc_diffs[i]
+    int_rate <- int_rates[i]
 
-  a <- 1/soc_diff^2
-  b <- 1/(soc_diff^2 * int_rate)
+    a <- 1/soc_diff^2
+    b <- 1/(soc_diff^2 * int_rate)
 
-  pvals <- rep(0, 1)
+    pvals <- rep(0, 1)
 
-  for (i in 1:num_iters) {
-    alpha <- matrix(rgamma(nodes^2, a, b), nodes, nodes) # Actual rate.
+    for (j in 1:num_iters) {
+      alpha <- matrix(rgamma(nodes^2, a, b), nodes, nodes) # Actual rate.
 
-    if (directed) {
-      alpha <- alpha * upper.tri(alpha) + alpha * lower.tri(alpha)
-      mode = "directed"
-    } else{
-      alpha <- alpha * upper.tri(alpha)
-      alpha <- alpha + t(alpha)
-      mode = "undirected"
+      if (directed) {
+        alpha <- alpha * upper.tri(alpha) + alpha * lower.tri(alpha)
+        mode = "directed"
+      } else{
+        alpha <- alpha * upper.tri(alpha)
+        alpha <- alpha + t(alpha)
+        mode = "undirected"
+      }
+
+      net <- igraph::graph_from_adjacency_matrix(alpha, mode=mode, weighted=TRUE)
+      metric <- metric_fn(net)
+
+      r <- effect
+      effect_size <- r * sqrt(1/(1 - r))/(sd(metric) * sqrt(r + 1))
+
+      trait <- 1 + effect_size * metric + rnorm(nodes, sd=1)
+
+      alpha <- as.vector(alpha)
+      sampling_times <- as.vector(sampling_times)
+      alpha_hat <- rpois(nodes^2, alpha*sampling_times)/sampling_times # Sampled rate.
+      alpha_hat[is.nan(alpha_hat)] <- 0
+
+      # Build network
+      net_est <- igraph::graph_from_adjacency_matrix(matrix(alpha_hat, nodes, nodes), weighted=TRUE)
+      metric_est <- metric_fn(net_est)
+
+      pvals[j] <- summary(lm(trait ~ metric_est))$coefficients[2, 4]
     }
-
-    net <- igraph::graph_from_adjacency_matrix(alpha, mode=mode, weighted=TRUE)
-    metric <- metric_fn(net)
-
-    r <- effect
-    effect_size <- r * sqrt(1/(1 - r))/(sd(metric) * sqrt(r + 1))
-
-    trait <- 1 + effect_size * metric + rnorm(nodes, sd=1)
-
-    alpha <- as.vector(alpha)
-    sampling_times <- as.vector(sampling_times)
-    alpha_hat <- rpois(nodes^2, alpha*sampling_times)/sampling_times # Sampled rate.
-    alpha_hat[is.nan(alpha_hat)] <- 0
-
-    # Build network
-    net_est <- igraph::graph_from_adjacency_matrix(matrix(alpha_hat, nodes, nodes), weighted=TRUE)
-    metric_est <- metric_fn(net_est)
-
-    pvals[i] <- summary(lm(trait ~ metric_est))$coefficients[2, 4]
+    power <- mean(pvals < 0.05)
+    summary_table[i, ] <- c(soc_diff, int_rate, power)
+    # print(list(nodes=nodes, effect=effect, soc_diff=soc_diff, int_rate=int_rate, power=power))
   }
-  power <- mean(pvals < 0.05)
-  list(nodes=nodes, effect=effect, soc_diff=soc_diff, int_rate=int_rate, power=power)
+  cat("Done!\n\n")
+  obj <- list()
+  obj$summary_table <- summary_table
+  obj$nodes <- nodes
+  obj$effect <- effect
+  class(obj) <- "pwr_nodereg"
+  obj
+}
+
+print.pwr_nodereg <- function(obj) {
+  cat(paste0("Number of nodes: ", obj$nodes, "\n"))
+  cat(paste0("Effect size: ", obj$effect, "\n"))
+  print(obj$summary_table, row.names=FALSE)
 }

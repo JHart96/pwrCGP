@@ -20,25 +20,34 @@
 #' @export
 #'
 #' @examples
-pwr_elbow <- function(soc_diff, rho_max, I_max=1000) {
-  I <- seq(0, I_max, 0.01) # Maximum sampling effort.
+pwr_elbow <- function(soc_diffs, rho_max, I_max=10000) {
+  k <- length(soc_diffs)
+  summary_table <- matrix(0, nrow=k, ncol=3)
+  colnames(summary_table) <- c("Social Differentiation", "Sampling Effort", "Correlation")
+  rownames(summary_table) <- rep("", k)
 
-  rho_ <- (soc_diff * sqrt(I))/(sqrt(1 + I * soc_diff^2))
+  for (i in 1:k) {
+    soc_diff <- soc_diffs[i]
+    I <- seq(0, I_max, 0.01) # Maximum sampling effort.
 
-  rho_argmax <- which.min(abs(rho_ - rho_max))
-  max_rho_ <- rho_[rho_argmax]
-  max_I <- I[rho_argmax]
+    rho_ <- (soc_diff * sqrt(I))/(sqrt(1 + I * soc_diff^2))
 
-  theta <- atan2(max_rho_, max_I)
-  co = cos(theta)
-  si = sin(theta)
-  rotation_matrix = matrix(c(co, -si, si, co), nrow=2, ncol=2)
+    rho_argmax <- which.min(abs(rho_ - rho_max))
+    max_rho_ <- rho_[rho_argmax]
+    max_I <- I[rho_argmax]
 
-  rotated_data <- cbind(rho_, I) %*% rotation_matrix
+    theta <- atan2(max_rho_, max_I)
+    co = cos(theta)
+    si = sin(theta)
+    rotation_matrix = matrix(c(co, -si, si, co), nrow=2, ncol=2)
 
-  rho_prime <- rho_[which.max(rotated_data[, 1])] # Optimal rho, by diminishing returns principle.
+    rotated_data <- cbind(rho_, I) %*% rotation_matrix
 
-  I_prime <- I[which.max(rotated_data[, 1])] # Corresponding optimal sampling effort.
+    rho_prime <- rho_[which.max(rotated_data[, 1])] # Optimal rho, by diminishing returns principle.
 
-  list(sampling_effort=I_prime, correlation=rho_prime)
+    I_prime <- I[which.max(rotated_data[, 1])] # Corresponding optimal sampling effort.
+
+    summary_table[i, ] <- c(soc_diff, I_prime, rho_prime)
+  }
+  summary_table
 }
