@@ -38,6 +38,17 @@ Let's have a look at what X looks like:
 ```{r}
 X
 ```
+```
+     [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8]
+[1,]    0    0    2    0    2    2    0    0
+[2,]    0    0    0    7    0    0    6   13
+[3,]    2    0    0   12    5   14    1    0
+[4,]    0    7   12    0    0    0    0    4
+[5,]    2    0    5    0    0    1    0    1
+[6,]    2    0   14    0    1    0    0    0
+[7,]    0    6    1    0    0    0    0   11
+[8,]    0   13    0    4    1    0   11    0
+```
 
 Use the two matrices `X` and `D` to estimate the correlation between the sampled network and the true, underlying network. This will provide both a summary table of several properties of the data as well as a QQ diagnostic plot to qualitatively verify that the data fit the Gamma-Poisson model.
 
@@ -45,6 +56,21 @@ Use the two matrices `X` and `D` to estimate the correlation between the sampled
 net_cor_obj <- net_cor(X, D)
 net_cor_obj
 ```
+![Gamma-Poisson QQ Plot]("man/figures/qq_plot.png")
+
+```
+                                Estimate     SE Lower CI Upper CI
+Observed Social Differentiation    1.540     NA       NA       NA
+Mean Interaction Rate              0.274     NA       NA       NA
+Sampling Effort                    2.700     NA       NA       NA
+Est. Interaction Rate              0.274 0.1060    0.137    0.549
+Est. Social Differentiation        1.780 0.3450    1.230    2.580
+Est. Correlation                   0.946 0.0287    0.869    0.979
+```
+
+The QQ diagnostic plot shows that the data fit the model well, with a slight deviation at the tail. We should be okay to proceed now.
+
+The first three rows give the social differentiation, mean interaction rate, and sampling effort according to the observed data. The next three rows use the estimates from the Gamma-Poisson model to estimate the true interaction rate, social differentiation, and the correlation between the observed interaction rates and the true interaction rates.
 
 If you want to conduct power analysis for nodal regression, you will need to extract social differentiation, interaction rate, and sampling times from the summary object and the data matrices. We also recommend to extract the confidence intervals of these to capture the uncertainty of the data. You will also need to provide an `effect` value. This is the effect size (correlation coefficient) and reflects the true relationship between the response and predictors in the regression (the effect size we'd see with perfect, infinite sampling). 
 
@@ -58,11 +84,29 @@ effect <- 0.5
 pwr_nodereg(8, effect, social_differentiations, interaction_rates, sampling_times)
 ```
 
+```
+Running simulations...Done!
+
+Number of nodes: 8
+Effect size: 0.5
+ Social Differentiation Interaction Rate Power
+                   1.23            0.137 0.207
+                   1.78            0.274 0.227
+                   2.58            0.549 0.249
+```
+
 This shows us that we could expect a power of between 20.7 and 24.9% given the properties of the data and the true effect size = 0.5.
 
 If a different type of analysis is being conducted such as network subsetting, the diminishing returns/elbow estimator could be used to determine if sufficient data are available:
 ```{r}
 pwr_elbow(social_differentiations, rho_max=0.99) # Use rho_max=0.99 as in the paper.
+```
+
+```
+Social Differentiation Sampling Effort Correlation
+                   1.23            2.81   0.8997606
+                   1.78            1.34   0.8996477
+                   2.58            0.64   0.8999386
 ```
 
 The elbow method says we need a sampling effort of between 0.64 and 2.81 to reach the optimal level of correlation, which is roughly 90%. From our run of `net_cor` we know that sampling effort is 2.7, which is lower than the 2.81 upper CI estimate. This indicates that in the worst case scenario, we probably have roughly the optimal amount of sampling for our level of social differentiation.
