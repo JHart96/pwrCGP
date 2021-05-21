@@ -56,7 +56,7 @@ Use the two matrices `X` and `D` to estimate the correlation between the sampled
 net_cor_obj <- net_cor(X, D)
 net_cor_obj
 ```
-![Gamma-Poisson QQ Plot]("man/figures/qq_plot.png")
+![Gamma-Poisson QQ Plot](man/figures/qq_plot.png)
 
 ```
                                 Estimate     SE Lower CI Upper CI
