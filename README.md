@@ -1,4 +1,4 @@
-# pwrIRGP - Power Analysis for Social Networks Built From Count Data using a Gamma-Poisson model
+# pwrCGP - Power Analysis for Social Networks Built From Count Data using a Gamma-Poisson model
 
 This package can be used to estimate the accuracy of observed social networks built from count data. It uses a Gamma-Poisson model of social event counts to estimate the correlation between a sampled network and the true underlying network. The package also includes methods to conduct power analysis on nodal regression and to estimate the point at which increases in sampling effort lead to diminishing returns in accuracy.
 
