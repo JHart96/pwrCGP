@@ -10,16 +10,16 @@
 #' @param nodes Positive integer number of nodes.
 #' @param effect Real value between 0 and 1 describing the effect size (correlation coefficient) between response and predictor in the true underlying network, before considering sampling.
 #' @param soc_diff Positive real value descriing the social differentiation estimated using `net_cor`.
-#' @param int_rate Positive real value describing interaction rate estimated using `net_cor`.
+#' @param int_rate Positive real value describing event rate estimated using `net_cor`.
 #' @param samp_times Real value describing mean sampling time per dyad or square matrix of sampling times for each pair of nodes.
 #' @param sig_level Real valued significance level of power analysis. Defaults to 0.05.
 #' @param metric_fn Metric function used to compute node-level response. Choose from presets or provide a function that accepts igraph graphs as input and outputs a vector of the correct size.
 #' @param directed TRUE/FALSE indicating if the network is directed.
 #' @param num_iters Number of iterations used to calculate power.
 #'
-#' @return A list of three `n x n` matrices. `X` is the interaction observation
+#' @return A list of three `n x n` matrices. `X` is the event observation
 #'   matrix, `D` is the sampling time, and `A` is a matrix of the true
-#'   interaction rates.
+#'   event rates.
 #' @export
 #'
 #' @examples
@@ -28,7 +28,7 @@
 #' X <- sim_data$X
 #' D <- sim_data$D
 #'
-#' # Estimate social differentiation and interaction rate.
+#' # Estimate social differentiation and event rate.
 #' net_cor(X, D) # Pretend this gives us exactly soc_diff = 2.0 and int_rate=0.5.
 #'
 #' # Run node regression power analysis.
@@ -39,7 +39,7 @@ pwr_nodereg <- function (nodes, effect, soc_diffs, int_rates, samp_times, sig_le
   k <- length(soc_diffs)
 
   summary_table <- matrix(0, nrow=k, ncol=3)
-  colnames(summary_table) <- c("Social Differentiation", "Interaction Rate", "Power")
+  colnames(summary_table) <- c("Social Differentiation", "Event Rate", "Power")
   rownames(summary_table) <- rep("", k)
 
   if (length(metric_fn) > 1) {

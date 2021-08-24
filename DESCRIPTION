@@ -1,10 +1,10 @@
-Package: pwrIRGP
+Package: pwrCGP
 Type: Package
-Title: Power Analysis for Interaction Rate Social Networks using a Gamma-Poisson model
-Version: 0.2.0
+Title: Power Analysis for Social Networks Built from Count Data using a Gamma-Poisson model
+Version: 0.3.0
 Author: Jordan Hart
 Maintainer: Jordan D.A. Hart <jordan.da.hart@gmail.com>
-Description: Estimates properties of observed social networks built from interaction rates using a Gamma-Poisson model of interaction rates. Can also be used to conduct power analyses for these types of social networks. 
+Description: Estimates properties of observed social networks built from event rates using a Gamma-Poisson model of event rates. Can also be used to conduct power analyses for these types of social networks. 
 License: GPL-2
 Encoding: UTF-8
 LazyData: true

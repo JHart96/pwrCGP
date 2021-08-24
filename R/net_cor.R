@@ -91,7 +91,7 @@ net_cor <- function(X, D, directed=FALSE, ci=0.95, show_diagnostic=TRUE) {
   mu_q <- quantile(mu, probs=c(ci_lower, 0.5, ci_upper))
 
   summary <- matrix(nrow=6, ncol=4)
-  rownames(summary) <- c("Observed Social Differentiation", "Mean Interaction Rate", "Sampling Effort", "Est. Interaction Rate", "Est. Social Differentiation", "Est. Correlation")
+  rownames(summary) <- c("Observed Social Differentiation", "Mean Event Rate", "Sampling Effort", "Est. Event Rate", "Est. Social Differentiation", "Est. Correlation")
   colnames(summary) <- c("Estimate", "SE", "Lower CI", "Upper CI")
   summary[1, 1] <- sd(x)/mean(x)
   summary[2, 1] <- mean(x/d)
